@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 
 export default function LoginForm() {
@@ -52,7 +52,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-sans flex items-start gap-2">
-            <div className="mt-0.5">⚠️</div>
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
         )}
