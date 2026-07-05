@@ -54,8 +54,9 @@ export async function GET(req: Request) {
   page.drawText(total.toLocaleString('id-ID'), { x: 450, y, size: 12, font: boldFont });
 
   const pdfBytes = await pdfDoc.save();
+  const buffer = Buffer.from(pdfBytes);
 
-  return new NextResponse(pdfBytes, {
+  return new NextResponse(buffer, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="RAB_${rab.title}.pdf"`,
