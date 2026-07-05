@@ -9,6 +9,8 @@ export async function getDivisions() {
 export async function submitRegistration(data: {
   name: string;
   email: string;
+  npm: string;
+  angkatan: string;
   phone: string;
   divisionId: string;
   reason: string;
@@ -31,6 +33,8 @@ export async function submitRegistration(data: {
     data: {
       name: data.name,
       email: data.email,
+      npm: data.npm,
+      angkatan: data.angkatan,
       phone: data.phone,
       divisionId: data.divisionId,
       reason: data.reason,

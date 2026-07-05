@@ -159,6 +159,8 @@ Password: password123`;
               <div className="space-y-3 text-sm font-sans mb-6">
                 <div><span className="font-semibold block text-body-mid text-xs">Nama:</span> {selectedReg.name}</div>
                 <div><span className="font-semibold block text-body-mid text-xs">Email:</span> {selectedReg.email}</div>
+                <div><span className="font-semibold block text-body-mid text-xs">NPM:</span> {selectedReg.npm}</div>
+                <div><span className="font-semibold block text-body-mid text-xs">Angkatan:</span> {selectedReg.angkatan}</div>
                 <div><span className="font-semibold block text-body-mid text-xs">No HP (WA):</span> {selectedReg.phone}</div>
                 <div><span className="font-semibold block text-body-mid text-xs">Pilihan Divisi:</span> {selectedReg.division?.name}</div>
                 <div><span className="font-semibold block text-body-mid text-xs">Alasan Memilih:</span> <p className="mt-1 bg-canvas-soft p-2 rounded">{selectedReg.reason}</p></div>

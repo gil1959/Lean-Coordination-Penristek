@@ -5,7 +5,7 @@ import { submitRegistration } from "./actions";
 
 export default function RegisterClient({ divisions }: { divisions: any[] }) {
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", divisionId: "", reason: "", willingToMove: "Ya", moveReason: ""
+    name: "", email: "", npm: "", angkatan: "", phone: "", divisionId: "", reason: "", willingToMove: "Ya", moveReason: ""
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{type: "error"|"success", text: string} | null>(null);
@@ -20,7 +20,7 @@ export default function RegisterClient({ divisions }: { divisions: any[] }) {
         willingToMove: form.willingToMove === "Ya"
       });
       setMessage({ type: "success", text: "Pendaftaran berhasil disubmit! Menunggu konfirmasi dari panitia." });
-      setForm({ name: "", email: "", phone: "", divisionId: "", reason: "", willingToMove: "Ya", moveReason: "" });
+      setForm({ name: "", email: "", npm: "", angkatan: "", phone: "", divisionId: "", reason: "", willingToMove: "Ya", moveReason: "" });
     } catch (err: any) {
       setMessage({ type: "error", text: err.message });
     } finally {
@@ -74,6 +74,21 @@ export default function RegisterClient({ divisions }: { divisions: any[] }) {
               <div>
                 <label className="text-sm font-semibold block mb-1">Nama Lengkap</label>
                 <input required className="text-input w-full" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} placeholder="Contoh: Budi Santoso" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="text-sm font-semibold block mb-1">NPM</label>
+                  <input type="text" required className="text-input w-full" value={form.npm} onChange={e=>setForm({...form, npm: e.target.value})} placeholder="Contoh: 123456789" />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold block mb-1">Angkatan</label>
+                  <select required className="text-input w-full" value={form.angkatan} onChange={e=>setForm({...form, angkatan: e.target.value})}>
+                    <option value="">-- Pilih Angkatan --</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                  </select>
+                </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
