@@ -61,7 +61,12 @@ export default function Sidebar({ user }: { user: any }) {
       <div className="p-4 border-t border-ink bg-canvas-soft flex items-center justify-between">
         <div className="flex flex-col overflow-hidden">
           <span className="font-sans font-semibold text-sm text-ink truncate">{user.name}</span>
-          <span className="font-sans text-xs text-body-mid truncate">{user.role}</span>
+          <span className="font-sans text-xs text-body-mid truncate">
+            {user.role === 'SUPER_ADMIN' ? 'Ketua Panitia' : 
+             user.role === 'KOORDINATOR_DIVISI' ? 'Koordinator' : 
+             user.role === 'PJ' ? 'Penanggung Jawab' : 
+             user.role}
+          </span>
         </div>
         <form action={customSignOut}>
           <button 

@@ -94,8 +94,15 @@ export async function deleteUser(userId: string) {
     throw new Error("Tidak bisa menghapus akun sendiri");
   }
 
+  const userToDelete = await prisma.user.findUnique({ where: { id: userId } });
+  if (!userToDelete) throw new Error("User not found");
+
   await prisma.user.delete({
     where: { id: userId }
+  });
+
+  await prisma.registration.deleteMany({
+    where: { email: userToDelete.email }
   });
 
   revalidatePath("/dashboard/admin");

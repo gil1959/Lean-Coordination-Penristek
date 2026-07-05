@@ -20,6 +20,20 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
   const [deadline, setDeadline] = useState("");
   const [notes, setNotes] = useState("");
   
+  // Search states
+  const [searchR, setSearchR] = useState("");
+  const [searchA, setSearchA] = useState("");
+  const [searchC, setSearchC] = useState("");
+  const [searchI, setSearchI] = useState("");
+
+  const formatRole = (r: string) => {
+    if (r === "SUPER_ADMIN") return "Ketua Panitia";
+    if (r === "KOORDINATOR_DIVISI") return "Koordinator";
+    if (r === "PJ") return "Penanggung Jawab";
+    if (!r) return "";
+    return r.charAt(0) + r.slice(1).toLowerCase();
+  };
+  
   // Feedback states
   const [rejectNotes, setRejectNotes] = useState<{ [taskId: string]: string }>({});
   const [saran, setSaran] = useState<{ [taskId: string]: string }>({});
@@ -55,6 +69,7 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
     setShowNewTaskForm(false);
     setTitle(""); setDivisiId(""); setPicIds([]); setDeadline(""); setNotes("");
     setAccountableId(""); setConsultedIds([]); setInformedIds([]); setInformAll(false);
+    setSearchR(""); setSearchA(""); setSearchC(""); setSearchI("");
   };
 
   const togglePic = (id: string) => setPicIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -124,43 +139,52 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
           </div>
 
           <div className="flex flex-col bg-blue-50 p-2 rounded border border-blue-100"><label className="text-sm font-semibold text-blue-900">(R) Responsible (Bisa &gt;1)</label>
-            <div className="h-24 overflow-y-auto mt-1 border border-blue-200 bg-white rounded p-1 text-sm">
-              {rUsers.map((u:any) => (
-                <label key={u.id} className="flex items-center gap-2 p-1 hover:bg-blue-50 cursor-pointer">
-                  <input type="checkbox" checked={picIds.includes(u.id)} onChange={() => togglePic(u.id)} /> {u.name}
+            <input type="text" placeholder="Cari nama..." className="text-input mt-1 mb-1 text-xs py-1.5" value={searchR} onChange={e=>setSearchR(e.target.value)} />
+            <div className="h-28 overflow-y-auto mt-1 border border-blue-200 bg-white rounded p-1 text-sm shadow-inner">
+              {rUsers.filter((u:any) => u.name.toLowerCase().includes(searchR.toLowerCase())).map((u:any) => (
+                <label key={u.id} className="flex items-center gap-2 p-1.5 hover:bg-blue-50 cursor-pointer rounded">
+                  <input type="checkbox" checked={picIds.includes(u.id)} onChange={() => togglePic(u.id)} /> {u.name} <span className="text-[10px] text-blue-500 italic">({formatRole(u.role)})</span>
                 </label>
               ))}
             </div>
             {isCO && <p className="text-[10px] text-blue-700 mt-1">*Hanya menampilkan anggota divisi Anda</p>}
           </div>
 
-          <div className="flex flex-col bg-red-50 p-2 rounded border border-red-100"><label className="text-sm font-semibold text-red-900">(A) Accountable</label>
-            <select className="text-input mt-1" value={accountableId} onChange={e=>setAccountableId(e.target.value)}>
-              <option value="">Pilih Pengambil Keputusan</option>
-              {users.map((u:any)=><option key={u.id} value={u.id}>{u.name}</option>)}
-            </select>
+          <div className="flex flex-col bg-red-50 p-2 rounded border border-red-100"><label className="text-sm font-semibold text-red-900">(A) Accountable (Pilih 1)</label>
+            <input type="text" placeholder="Cari nama..." className="text-input mt-1 mb-1 text-xs py-1.5" value={searchA} onChange={e=>setSearchA(e.target.value)} />
+            <div className="h-28 overflow-y-auto mt-1 border border-red-200 bg-white rounded p-1 text-sm shadow-inner">
+              {users.filter((u:any) => u.name.toLowerCase().includes(searchA.toLowerCase())).map((u:any) => (
+                <label key={u.id} className="flex items-center gap-2 p-1.5 hover:bg-red-50 cursor-pointer rounded">
+                  <input type="radio" name="accountable" checked={accountableId === u.id} onChange={() => setAccountableId(u.id)} /> {u.name} <span className="text-[10px] text-red-500 italic">({formatRole(u.role)})</span>
+                </label>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-col bg-yellow-50 p-2 rounded border border-yellow-100"><label className="text-sm font-semibold text-yellow-900">(C) Consulted (Bisa pilih &gt;1)</label>
-            <div className="h-24 overflow-y-auto mt-1 border border-mute bg-canvas rounded p-1 text-sm">
-              {users.map((u:any) => (
-                <label key={u.id} className="flex items-center gap-2 p-1 hover:bg-canvas-soft cursor-pointer">
-                  <input type="checkbox" checked={consultedIds.includes(u.id)} onChange={() => toggleConsulted(u.id)} /> {u.name}
+          <div className="flex flex-col bg-yellow-50 p-2 rounded border border-yellow-100"><label className="text-sm font-semibold text-yellow-900">(C) Consulted (Bisa &gt;1)</label>
+            <input type="text" placeholder="Cari nama..." className="text-input mt-1 mb-1 text-xs py-1.5" value={searchC} onChange={e=>setSearchC(e.target.value)} />
+            <div className="h-28 overflow-y-auto mt-1 border border-yellow-200 bg-white rounded p-1 text-sm shadow-inner">
+              {users.filter((u:any) => u.name.toLowerCase().includes(searchC.toLowerCase())).map((u:any) => (
+                <label key={u.id} className="flex items-center gap-2 p-1.5 hover:bg-yellow-50 cursor-pointer rounded">
+                  <input type="checkbox" checked={consultedIds.includes(u.id)} onChange={() => toggleConsulted(u.id)} /> {u.name} <span className="text-[10px] text-yellow-600 italic">({formatRole(u.role)})</span>
                 </label>
               ))}
             </div>
           </div>
 
           <div className="flex flex-col bg-green-50 p-2 rounded border border-green-100"><label className="text-sm font-semibold text-green-900">(I) Informed</label>
-            <label className="flex items-center gap-2 mb-1 mt-1 text-sm"><input type="checkbox" checked={informAll} onChange={e=>setInformAll(e.target.checked)} /> <b>Semua Orang (Inform All)</b></label>
+            <label className="flex items-center gap-2 mb-2 mt-1 text-sm bg-green-100 p-2 rounded border border-green-200"><input type="checkbox" checked={informAll} onChange={e=>setInformAll(e.target.checked)} /> <b>Semua Orang (Inform All)</b></label>
             {!informAll && (
-              <div className="h-16 overflow-y-auto border border-mute bg-canvas rounded p-1 text-sm">
-                {users.map((u:any) => (
-                  <label key={u.id} className="flex items-center gap-2 p-1 hover:bg-canvas-soft cursor-pointer">
-                    <input type="checkbox" checked={informedIds.includes(u.id)} onChange={() => toggleInformed(u.id)} /> {u.name}
-                  </label>
-                ))}
-              </div>
+              <>
+                <input type="text" placeholder="Cari nama..." className="text-input mb-1 text-xs py-1.5" value={searchI} onChange={e=>setSearchI(e.target.value)} />
+                <div className="h-20 overflow-y-auto border border-green-200 bg-white rounded p-1 text-sm shadow-inner">
+                  {users.filter((u:any) => u.name.toLowerCase().includes(searchI.toLowerCase())).map((u:any) => (
+                    <label key={u.id} className="flex items-center gap-2 p-1.5 hover:bg-green-50 cursor-pointer rounded">
+                      <input type="checkbox" checked={informedIds.includes(u.id)} onChange={() => toggleInformed(u.id)} /> {u.name} <span className="text-[10px] text-green-600 italic">({formatRole(u.role)})</span>
+                    </label>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 

@@ -7,6 +7,14 @@ export default function AdminClient({ initialData }: { initialData: any }) {
   const { divisions, users, role, userDivisiId } = initialData;
   const [activeTab, setActiveTab] = useState<"USERS" | "DIVISI">("USERS");
   
+  const formatRole = (r: string) => {
+    if (r === "SUPER_ADMIN") return "Ketua Panitia";
+    if (r === "KOORDINATOR_DIVISI") return "Koordinator";
+    if (r === "PJ") return "Penanggung Jawab";
+    if (!r) return "";
+    return r.charAt(0) + r.slice(1).toLowerCase();
+  };
+  
   // User Form
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -103,7 +111,7 @@ export default function AdminClient({ initialData }: { initialData: any }) {
                         <option value="SEKRETARIS">Sekretaris</option>
                         <option value="BENDAHARA">Bendahara</option>
                         <option value="PENASIHAT">Penasihat</option>
-                        <option value="SUPER_ADMIN">Super Admin</option>
+                        <option value="SUPER_ADMIN">Ketua Panitia (Super Admin)</option>
                       </>
                     )}
                   </select>
@@ -145,7 +153,7 @@ export default function AdminClient({ initialData }: { initialData: any }) {
                     <tr key={u.id}>
                       <td className="px-4 py-3 font-medium">{u.name}</td>
                       <td className="px-4 py-3">{u.email}</td>
-                      <td className="px-4 py-3"><span className="badge-pill bg-gray-100">{u.role}</span></td>
+                      <td className="px-4 py-3"><span className="badge-pill bg-gray-100">{formatRole(u.role)}</span></td>
                       <td className="px-4 py-3">{u.divisi?.name || "-"}</td>
                       {isSuperAdmin && (
                         <td className="px-4 py-3">
