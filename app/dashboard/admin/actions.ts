@@ -79,3 +79,24 @@ export async function createUser(data: { name: string; email: string; role: stri
 
   revalidatePath("/dashboard/admin");
 }
+
+export async function deleteUser(userId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+  
+  const currentUser = session.user as any;
+
+  if (currentUser.role !== "SUPER_ADMIN") {
+    throw new Error("Forbidden: Only Super Admin can delete users");
+  }
+
+  if (currentUser.id === userId) {
+    throw new Error("Tidak bisa menghapus akun sendiri");
+  }
+
+  await prisma.user.delete({
+    where: { id: userId }
+  });
+
+  revalidatePath("/dashboard/admin");
+}

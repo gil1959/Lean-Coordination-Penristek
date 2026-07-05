@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createDivisi, createUser } from "./actions";
+import { createDivisi, createUser, deleteUser } from "./actions";
 
 export default function AdminClient({ initialData }: { initialData: any }) {
   const { divisions, users, role, userDivisiId } = initialData;
@@ -37,6 +37,15 @@ export default function AdminClient({ initialData }: { initialData: any }) {
     try {
       await createDivisi(divisiName);
       setDivisiName("");
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Yakin ingin menghapus user ${userName}?`)) return;
+    try {
+      await deleteUser(userId);
     } catch (e: any) {
       alert(e.message);
     }
@@ -128,6 +137,7 @@ export default function AdminClient({ initialData }: { initialData: any }) {
                     <th className="px-4 py-3 font-semibold text-ink-soft">Email</th>
                     <th className="px-4 py-3 font-semibold text-ink-soft">Role</th>
                     <th className="px-4 py-3 font-semibold text-ink-soft">Divisi</th>
+                    {isSuperAdmin && <th className="px-4 py-3 font-semibold text-ink-soft">Aksi</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-mute">
@@ -137,6 +147,16 @@ export default function AdminClient({ initialData }: { initialData: any }) {
                       <td className="px-4 py-3">{u.email}</td>
                       <td className="px-4 py-3"><span className="badge-pill bg-gray-100">{u.role}</span></td>
                       <td className="px-4 py-3">{u.divisi?.name || "-"}</td>
+                      {isSuperAdmin && (
+                        <td className="px-4 py-3">
+                          <button 
+                            onClick={() => handleDeleteUser(u.id, u.name)}
+                            className="text-red-600 hover:text-red-800 font-semibold"
+                          >
+                            Hapus
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
