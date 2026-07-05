@@ -19,7 +19,6 @@ async function main() {
 
   console.log('Creating Divisions...')
   
-  const bphDiv = await prisma.divisi.create({ data: { name: 'BPH' } })
   const pddDiv = await prisma.divisi.create({ data: { name: 'PDD' } })
   const acaraDiv = await prisma.divisi.create({ data: { name: 'Acara' } })
 
@@ -27,7 +26,7 @@ async function main() {
   const password = await bcrypt.hash('password123', 10)
 
   // Function to create user
-  const createUser = async (name: string, role: Role, divisiId: string, customEmail?: string) => {
+  const createUser = async (name: string, role: Role, divisiId: string | null, customEmail?: string) => {
     const email = customEmail || `${name.split(' ')[0].toLowerCase()}@bootcamp.com`
     return await prisma.user.create({
       data: {
@@ -40,11 +39,11 @@ async function main() {
     })
   }
 
-  // BPH
-  await createUser('Ragil Kurniawan', Role.SUPER_ADMIN, bphDiv.id)
-  await createUser('Kadafi Naufalla', Role.PENASIHAT, bphDiv.id)
-  await createUser('Cahaya Vianika', Role.SEKRETARIS, bphDiv.id)
-  await createUser('Sri Wahyuni', Role.BENDAHARA, bphDiv.id)
+  // Inti (Tidak ada divisi)
+  await createUser('Ragil Kurniawan', Role.SUPER_ADMIN, null)
+  await createUser('Kadafi Naufalla', Role.PENASIHAT, null)
+  await createUser('Cahaya Vianika', Role.SEKRETARIS, null)
+  await createUser('Sri Wahyuni', Role.BENDAHARA, null)
 
   // PDD
   await createUser('Kevin Prasetiyo', Role.KOORDINATOR_DIVISI, pddDiv.id)
