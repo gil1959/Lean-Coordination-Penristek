@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ANGGOTA)
+  divisiId  String?
+  divisi    Divisi?  @relation(fields: [divisiId], references: [id])
+  tasksPIC  Task[]   @relation("PIC")
+  raciRoles RACI[]
+  comments  Comment[]
+  logs      ActivityLog[]
+  rabs      RAB[]
+}
+
+enum Role {
+  SUPER_ADMIN
+  PENASIHAT
+  SEKRETARIS
+  BENDAHARA
+  KOORDINATOR_DIVISI
+  PJ
+  ANGGOTA
+}
+
+model Divisi {
+  id                String @id @default(cuid())
+  name              String @unique
+  whatsappGroupLink String?
+  users             User[]
+  tasks             Task[]
+  registrations     Registration[] @relation("ChosenDiv")
+  assignedRegs      Registration[] @relation("AssignedDiv")
+}
+
+model Task {
+  id        String    @id @default(cuid())
+  title     String
+  divisiId  String
+  divisi    Divisi    @relation(fields: [divisiId], references: [id])
+  picId     String?
+  pic       User?     @relation("PIC", fields: [picId], references: [id])
+  status         TaskStatus @default(BELUM)
+  approvalStatus TaskApproval @default(WAITING)
+  approvalNotes  String?
+  informAll      Boolean @default(false)
+  deadline       DateTime?
+  notes          String?
+  proofUrl       String?
+  proofNotes     String?
+  raci           RACI[]
+  comments       Comment[]
+}
+
+enum TaskApproval {
+  WAITING
+  APPROVED
+  REJECTED
+}
+
+enum TaskStatus {
+  BELUM
+  PROSES
+  SELESAI
+  TERHAMBAT
+}
+
+model RACI {
+  id       String   @id @default(cuid())
+  taskId   String
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleType RaciRole
+}
+
+enum RaciRole {
+  R // Responsible
+  A // Accountable
+  C // Consulted
+  I // Informed
+}
+
+model RAB {
+  id        String     @id @default(cuid())
+  title     String
+  status    RABStatus  @default(DRAFT)
+  items     RABItem[]
+  creatorId String?
+  creator   User?      @relation(fields: [creatorId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum RABStatus {
+  DRAFT
+  USULAN
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model RABItem {
+  id         String @id @default(cuid())
+  rabId      String
+  rab        RAB    @relation(fields: [rabId], references: [id], onDelete: Cascade)
+  category   String
+  item       String
+  qty        Int
+  unitPrice  Float
+  subtotal   Float
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  text      String
+  timestamp DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  detail    String?
+  timestamp DateTime @default(now())
+}
+
+model Registration {
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  phone           String
+  divisionId      String
+  division        Divisi    @relation("ChosenDiv", fields: [divisionId], references: [id])
+  reason          String
+  willingToMove   Boolean
+  moveReason      String?
+  status          RegStatus @default(PENDING)
+  assignedDivId   String?
+  assignedDiv     Divisi?   @relation("AssignedDiv", fields: [assignedDivId], references: [id])
+  createdAt       DateTime  @default(now())
+}
+
+enum RegStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}

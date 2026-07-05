@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #ff4f00;
+  --color-on-primary: #fffefb;
+  --color-ink: #201515;
+  --color-ink-soft: #2f2a26;
+  --color-ink-mid: #36342e;
+  --color-body: #605d52;
+  --color-body-mid: #939084;
+  --color-mute: #c5c0b1;
+  --color-canvas: #fffefb;
+  --color-canvas-soft: #f8f4f0;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: var(--color-primary);
+  --color-on-primary: var(--color-on-primary);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-mid: var(--color-ink-mid);
+  --color-body: var(--color-body);
+  --color-body-mid: var(--color-body-mid);
+  --color-mute: var(--color-mute);
+  --color-canvas: var(--color-canvas);
+  --color-canvas-soft: var(--color-canvas-soft);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Degular Display", "Inter", system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-pill: 9999px;
+  --radius-full: 9999px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+@layer utilities {
+  .btn-primary {
+    @apply bg-primary text-on-primary font-semibold text-[18px] leading-[27px] rounded-md px-6 py-3;
+  }
+  .btn-secondary {
+    @apply bg-ink text-on-primary font-semibold text-[18px] leading-[27px] rounded-md px-6 py-3;
+  }
+  .btn-tertiary {
+    @apply bg-canvas text-ink border border-ink font-semibold text-[18px] leading-[27px] rounded-md px-6 py-3;
+  }
+  .btn-text {
+    @apply bg-canvas text-ink font-bold text-[14.4px] leading-[14.4px] tracking-[0.144px] rounded-md px-4 py-2;
+  }
+  .card-content {
+    @apply bg-canvas-soft text-ink rounded-md p-6;
+  }
+  .text-input {
+    @apply bg-canvas text-ink border border-ink rounded-sm px-4 py-3 text-[18px] leading-[27px];
+  }
+  .badge-pill {
+    @apply bg-canvas-soft text-ink rounded-pill px-3 py-1 text-[16px] leading-[24px];
+  }
+  .display-xl {
+    @apply font-display font-medium text-[56px] leading-[56px];
+  }
+  .display-lg {
+    @apply font-display font-medium text-[48px] leading-[48px];
+  }
+  .display-md {
+    @apply font-display font-medium text-[32px] leading-[36px] tracking-[1px];
+  }
+  .eyebrow-uppercase {
+    @apply font-display font-medium text-[14px] leading-[14px] tracking-[1px] uppercase;
+  }
 }
