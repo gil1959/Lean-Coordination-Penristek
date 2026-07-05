@@ -1,5 +1,6 @@
 import LoginForm from "./LoginForm";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export default function LoginPage() {
   return (
@@ -39,7 +40,9 @@ export default function LoginPage() {
       {/* Right side - Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-24 relative bg-canvas">
         <div className="w-full max-w-md">
-          <LoginForm />
+          <Suspense fallback={<div className="flex justify-center p-8"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </div>
