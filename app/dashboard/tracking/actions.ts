@@ -42,7 +42,7 @@ export async function getTrackingData() {
 }
 
 export async function createTask(data: { 
-  title: string; divisiId: string; picId: string; deadline: string; notes: string;
+  title: string; divisiId: string; picIds: string[]; deadline: string; notes: string;
   accountableId?: string; consultedIds?: string[]; informedIds?: string[]; informAll?: boolean;
 }) {
   const session = await getServerSession(authOptions);
@@ -57,7 +57,7 @@ export async function createTask(data: {
     data: {
       title: data.title,
       divisiId: data.divisiId,
-      picId: data.picId || null,
+      picId: data.picIds && data.picIds.length > 0 ? data.picIds[0] : null,
       deadline: data.deadline ? new Date(data.deadline) : null,
       notes: data.notes,
       status: "BELUM",
@@ -69,9 +69,11 @@ export async function createTask(data: {
   // Create RACI records
   const raciData = [];
   
-  // Responsible (R) -> PIC
-  if (data.picId) {
-    raciData.push({ taskId: task.id, userId: data.picId, roleType: "R" });
+  // Responsible (R) -> PICs
+  if (data.picIds && data.picIds.length > 0) {
+    data.picIds.forEach((id) => {
+      raciData.push({ taskId: task.id, userId: id, roleType: "R" });
+    });
   }
   
   // Accountable (A)

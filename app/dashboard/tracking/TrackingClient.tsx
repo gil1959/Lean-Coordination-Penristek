@@ -12,7 +12,7 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
   // New task form state
   const [title, setTitle] = useState("");
   const [divisiId, setDivisiId] = useState("");
-  const [picId, setPicId] = useState("");
+  const [picIds, setPicIds] = useState<string[]>([]);
   const [accountableId, setAccountableId] = useState("");
   const [consultedIds, setConsultedIds] = useState<string[]>([]);
   const [informedIds, setInformedIds] = useState<string[]>([]);
@@ -43,20 +43,21 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
     e.preventDefault();
     if (!title || !divisiId) return;
 
-    if (!picId || !accountableId || consultedIds.length === 0 || (!informAll && informedIds.length === 0)) {
+    if (picIds.length === 0 || !accountableId || consultedIds.length === 0 || (!informAll && informedIds.length === 0)) {
       showPopup("Semua kolom RACI (R, A, C, I) harus diisi! Jika 'I' untuk semua orang, centang opsi 'Semua Orang'.", "error");
       return;
     }
 
     await createTask({ 
-      title, divisiId, picId, deadline, notes, 
+      title, divisiId, picIds, deadline, notes, 
       accountableId, consultedIds, informedIds, informAll 
     });
     setShowNewTaskForm(false);
-    setTitle(""); setDivisiId(""); setPicId(""); setDeadline(""); setNotes("");
+    setTitle(""); setDivisiId(""); setPicIds([]); setDeadline(""); setNotes("");
     setAccountableId(""); setConsultedIds([]); setInformedIds([]); setInformAll(false);
   };
 
+  const togglePic = (id: string) => setPicIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const toggleConsulted = (id: string) => setConsultedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const toggleInformed = (id: string) => setInformedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
@@ -100,7 +101,18 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
 
       {showNewTaskForm && (
         <form onSubmit={handleCreate} className="card-content border border-mute grid grid-cols-2 gap-4">
-          <div className="col-span-2"><h3 className="font-semibold text-lg border-b border-mute pb-2">Create New Task (RACI Setup)</h3></div>
+          <div className="col-span-2">
+            <h3 className="font-semibold text-lg border-b border-mute pb-2 mb-2">Create New Task (RACI Setup)</h3>
+            <div className="bg-canvas-soft p-3 rounded border border-mute text-sm font-sans mb-2">
+              <p className="font-semibold mb-1">Panduan RACI:</p>
+              <ul className="list-disc pl-5 space-y-1 text-ink-soft">
+                <li><b className="text-blue-800">Responsible (R):</b> Pihak yang secara langsung mengerjakan dan menyelesaikan task ini.</li>
+                <li><b className="text-red-800">Accountable (A):</b> Pihak yang mengambil keputusan, me-review, dan bertanggung jawab atas hasil akhir (biasanya Koordinator / BPH). Hanya boleh 1 orang.</li>
+                <li><b className="text-yellow-800">Consulted (C):</b> Pihak yang dimintai pendapat atau sarannya sebelum task diselesaikan.</li>
+                <li><b className="text-green-800">Informed (I):</b> Pihak yang hanya perlu diinformasikan mengenai progress / hasil dari task.</li>
+              </ul>
+            </div>
+          </div>
           
           <div className="flex flex-col"><label className="text-sm font-semibold">Title</label><input required className="text-input" value={title} onChange={e=>setTitle(e.target.value)} /></div>
           
@@ -111,11 +123,14 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
             </select>
           </div>
 
-          <div className="flex flex-col bg-blue-50 p-2 rounded border border-blue-100"><label className="text-sm font-semibold text-blue-900">(R) Responsible / PIC</label>
-            <select className="text-input mt-1" value={picId} onChange={e=>setPicId(e.target.value)}>
-              <option value="">Pilih Pekerja Utama</option>
-              {rUsers.map((u:any)=><option key={u.id} value={u.id}>{u.name}</option>)}
-            </select>
+          <div className="flex flex-col bg-blue-50 p-2 rounded border border-blue-100"><label className="text-sm font-semibold text-blue-900">(R) Responsible (Bisa &gt;1)</label>
+            <div className="h-24 overflow-y-auto mt-1 border border-blue-200 bg-white rounded p-1 text-sm">
+              {rUsers.map((u:any) => (
+                <label key={u.id} className="flex items-center gap-2 p-1 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" checked={picIds.includes(u.id)} onChange={() => togglePic(u.id)} /> {u.name}
+                </label>
+              ))}
+            </div>
             {isCO && <p className="text-[10px] text-blue-700 mt-1">*Hanya menampilkan anggota divisi Anda</p>}
           </div>
 
@@ -183,7 +198,7 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
                     <p className="font-sans font-medium text-ink text-sm leading-tight">{task.title}</p>
                     
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {task.pic && <span className="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200">R: {task.pic.name}</span>}
+                      {task.raci?.filter((r:any)=>r.roleType==="R").map((r:any) => <span key={r.id} className="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200">R: {r.user.name}</span>)}
                       {task.raci?.filter((r:any)=>r.roleType==="A").map((r:any) => <span key={r.id} className="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded border border-red-200">A: {r.user.name}</span>)}
                     </div>
 
@@ -282,7 +297,7 @@ export default function TrackingClient({ initialData }: { initialData: any }) {
                 <tr key={task.id}>
                   <td className="px-4 py-3">{task.title}</td>
                   <td className="px-4 py-3">{task.divisi.name}</td>
-                  <td className="px-4 py-3">{task.pic?.name || "-"}</td>
+                  <td className="px-4 py-3">{task.raci?.filter((r:any)=>r.roleType==="R").map((r:any)=>r.user.name).join(", ") || "-"}</td>
                   <td className="px-4 py-3">{task.deadline ? new Date(task.deadline).toLocaleString("id-ID") : "-"}</td>
                   <td className="px-4 py-3">
                     <select 
