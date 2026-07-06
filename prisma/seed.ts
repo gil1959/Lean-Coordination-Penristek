@@ -49,14 +49,9 @@ async function main() {
   await createUser('Kevin Prasetiyo', Role.KOORDINATOR_DIVISI, pddDiv.id)
   
   const pddMembers = [
-    'Mario Andiko Dwi Saputra',
     'Abdillah Siraj Al Haqqi',
-    'Sakina Risa Julianti',
-    'Dini Kayla Putri Rahmawati',
     'Vikri Abdullah Razzak',
-    'Rifqi Reis Ramadhan',
-    'Ignes Puspa Lestari',
-    'Muhamad Gazril Alfariz'
+    'Rifqi Reis Ramadhan'
   ]
   
   for (const name of pddMembers) {
@@ -78,7 +73,12 @@ async function main() {
     'Rafi Pratama',
     'Dwi Juliani',
     'Afifah Chairunnisya',
-    'Tri Haiji Januarli'
+    'Tri Haiji Januarli',
+    'Mario Andiko Dwi Saputra',
+    'Sakina Risa Julianti',
+    'Dini Kayla Putri Rahmawati',
+    'Ignes Puspa Lestari',
+    'Muhamad Gazril Alfariz'
   ]
 
   for (const name of acaraMembers) {
