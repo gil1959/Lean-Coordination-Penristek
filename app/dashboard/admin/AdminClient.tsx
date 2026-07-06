@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createDivisi, createUser, deleteUser } from "./actions";
+import { createDivisi, createUser, deleteUser, updateUser } from "./actions";
 
 export default function AdminClient({ initialData }: { initialData: any }) {
   const { divisions, users, role, userDivisiId } = initialData;
@@ -24,6 +24,11 @@ export default function AdminClient({ initialData }: { initialData: any }) {
   
   // Divisi Form
   const [divisiName, setDivisiName] = useState("");
+
+  // Edit State
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editRole, setEditRole] = useState<string>("");
+  const [editDivisiId, setEditDivisiId] = useState<string>("");
 
   const isSuperAdmin = role === "SUPER_ADMIN";
 
@@ -54,6 +59,26 @@ export default function AdminClient({ initialData }: { initialData: any }) {
     if (!confirm(`Yakin ingin menghapus user ${userName}?`)) return;
     try {
       await deleteUser(userId);
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  const startEdit = (u: any) => {
+    setEditingUserId(u.id);
+    setEditRole(u.role);
+    setEditDivisiId(u.divisiId || "");
+  };
+
+  const cancelEdit = () => {
+    setEditingUserId(null);
+  };
+
+  const handleUpdate = async () => {
+    if (!editingUserId) return;
+    try {
+      await updateUser(editingUserId, { role: editRole, divisiId: editDivisiId });
+      setEditingUserId(null);
     } catch (e: any) {
       alert(e.message);
     }
@@ -153,16 +178,51 @@ export default function AdminClient({ initialData }: { initialData: any }) {
                     <tr key={u.id}>
                       <td className="px-4 py-3 font-medium">{u.name}</td>
                       <td className="px-4 py-3">{u.email}</td>
-                      <td className="px-4 py-3"><span className="badge-pill bg-gray-100">{formatRole(u.role)}</span></td>
-                      <td className="px-4 py-3">{u.divisi?.name || "-"}</td>
+                      <td className="px-4 py-3">
+                        {editingUserId === u.id ? (
+                          <select className="text-input text-xs w-full py-1" value={editRole} onChange={e=>setEditRole(e.target.value)}>
+                            <option value="ANGGOTA">Anggota</option>
+                            <option value="PJ">PJ (Penanggung Jawab)</option>
+                            <option value="KOORDINATOR_DIVISI">Koordinator Divisi</option>
+                            <option value="SEKRETARIS">Sekretaris</option>
+                            <option value="BENDAHARA">Bendahara</option>
+                            <option value="PENASIHAT">Penasihat</option>
+                            <option value="SUPER_ADMIN">Ketua Panitia (Super Admin)</option>
+                          </select>
+                        ) : (
+                          <span className="badge-pill bg-gray-100">{formatRole(u.role)}</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {editingUserId === u.id ? (
+                          <select 
+                            className="text-input text-xs w-full py-1 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            value={editDivisiId} 
+                            onChange={e=>setEditDivisiId(e.target.value)}
+                            disabled={!["ANGGOTA", "PJ", "KOORDINATOR_DIVISI"].includes(editRole)}
+                          >
+                            <option value="">-- Pilih Divisi --</option>
+                            {divisions.map((d: any) => (
+                              <option key={d.id} value={d.id}>{d.name}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          u.divisi?.name || "-"
+                        )}
+                      </td>
                       {isSuperAdmin && (
                         <td className="px-4 py-3">
-                          <button 
-                            onClick={() => handleDeleteUser(u.id, u.name)}
-                            className="text-red-600 hover:text-red-800 font-semibold"
-                          >
-                            Hapus
-                          </button>
+                          {editingUserId === u.id ? (
+                            <div className="flex gap-3">
+                              <button onClick={handleUpdate} className="text-green-600 hover:text-green-800 font-semibold text-xs">Simpan</button>
+                              <button onClick={cancelEdit} className="text-gray-500 hover:text-gray-700 font-semibold text-xs">Batal</button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-3">
+                              <button onClick={() => startEdit(u)} className="text-blue-600 hover:text-blue-800 font-semibold text-xs">Edit</button>
+                              <button onClick={() => handleDeleteUser(u.id, u.name)} className="text-red-600 hover:text-red-800 font-semibold text-xs">Hapus</button>
+                            </div>
+                          )}
                         </td>
                       )}
                     </tr>

@@ -107,3 +107,24 @@ export async function deleteUser(userId: string) {
 
   revalidatePath("/dashboard/admin");
 }
+
+export async function updateUser(userId: string, data: { role: string; divisiId: string | null }) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+  
+  const currentUser = session.user as any;
+
+  if (currentUser.role !== "SUPER_ADMIN") {
+    throw new Error("Forbidden: Only Super Admin can edit users");
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      role: data.role as any,
+      divisiId: data.divisiId || null,
+    }
+  });
+
+  revalidatePath("/dashboard/admin");
+}
