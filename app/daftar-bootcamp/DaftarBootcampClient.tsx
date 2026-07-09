@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { submitBootcampRegistration } from "./actions";
 import Link from "next/link";
 import { CheckCircle2, ChevronLeft } from "lucide-react";
@@ -11,6 +11,17 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
   const [success, setSuccess] = useState(false);
   const [links, setLinks] = useState<any>(null);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem('bootcamp_success');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setLinks(parsed);
+        setSuccess(true);
+      } catch (e) {}
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -53,6 +64,7 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
       const res = await submitBootcampRegistration(formData);
       setLinks(res.links);
       setSuccess(true);
+      sessionStorage.setItem('bootcamp_success', JSON.stringify(res.links));
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan saat mendaftar.");
     } finally {
