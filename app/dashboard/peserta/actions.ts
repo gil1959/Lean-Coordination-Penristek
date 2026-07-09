@@ -23,3 +23,10 @@ export async function updateTrackLink(trackId: string, link: string) {
   });
   revalidatePath("/dashboard/peserta");
 }
+
+export async function deleteParticipant(participantId: string) {
+  await prisma.participantRegistration.delete({
+    where: { id: participantId }
+  });
+  revalidatePath("/dashboard/peserta");
+}

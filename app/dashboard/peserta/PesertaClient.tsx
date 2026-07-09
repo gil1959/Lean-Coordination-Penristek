@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateTrackLink } from "./actions";
+import { updateTrackLink, deleteParticipant } from "./actions";
 import { X } from "lucide-react";
 
 export default function PesertaClient({ initialData }: { initialData: any }) {
@@ -27,6 +27,19 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
       await updateTrackLink(trackId, waLink);
       showPopup("success", "Link Grup WhatsApp berhasil disimpan.");
       setWaLink("");
+    } catch (e: any) {
+      showPopup("error", `Error: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus peserta ini?")) return;
+    setLoading(true);
+    try {
+      await deleteParticipant(id);
+      showPopup("success", "Peserta berhasil dihapus.");
     } catch (e: any) {
       showPopup("error", `Error: ${e.message}`);
     } finally {
@@ -138,12 +151,21 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
                       <span className="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">{p.experience2}</span>
                     </td>
                     <td className="p-3 text-right">
-                      <button 
-                        className="text-xs font-semibold text-primary hover:underline px-3 py-1 bg-primary/10 rounded-full transition-colors"
-                        onClick={() => setSelectedPeserta(p)}
-                      >
-                        Detail
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          className="text-xs font-semibold text-primary hover:underline px-3 py-1 bg-primary/10 rounded-full transition-colors"
+                          onClick={() => setSelectedPeserta(p)}
+                        >
+                          Detail
+                        </button>
+                        <button 
+                          className="text-xs font-semibold text-red-600 hover:underline px-3 py-1 bg-red-50 rounded-full transition-colors"
+                          onClick={() => handleDelete(p.id)}
+                          disabled={loading}
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

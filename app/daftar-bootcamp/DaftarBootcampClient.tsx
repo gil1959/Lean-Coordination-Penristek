@@ -76,7 +76,7 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
             <div className="p-4 rounded-xl border border-ink bg-canvas-soft">
               <p className="font-semibold text-sm mb-2">Opsi 1: {links.track1.name}</p>
               {links.track1.link ? (
-                <a href={links.track1.link} target="_blank" rel="noreferrer" className="btn-primary w-full justify-center">
+                <a href={links.track1.link} target="_blank" rel="noreferrer" className="btn-primary inline-flex justify-center px-6">
                   Gabung Grup WA
                 </a>
               ) : (
@@ -87,7 +87,7 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
             <div className="p-4 rounded-xl border border-ink bg-canvas-soft">
               <p className="font-semibold text-sm mb-2">Opsi 2: {links.track2.name}</p>
               {links.track2.link ? (
-                <a href={links.track2.link} target="_blank" rel="noreferrer" className="btn-primary w-full justify-center">
+                <a href={links.track2.link} target="_blank" rel="noreferrer" className="btn-primary inline-flex justify-center px-6">
                   Gabung Grup WA
                 </a>
               ) : (
@@ -96,11 +96,7 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-ink">
-            <Link href="/" className="text-body hover:text-primary transition-colors text-sm font-medium">
-              Kembali ke Beranda
-            </Link>
-          </div>
+
         </div>
       </div>
     );
