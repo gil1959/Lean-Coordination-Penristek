@@ -8,6 +8,7 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
   const { tracks, participants } = initialData;
   const [activeTab, setActiveTab] = useState<"daftar" | "link">("daftar");
   const [selectedPeserta, setSelectedPeserta] = useState<any>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   
   // Link settings state
   const [trackId, setTrackId] = useState(tracks.length > 0 ? tracks[0].id : "");
@@ -35,11 +36,11 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus peserta ini?")) return;
     setLoading(true);
     try {
       await deleteParticipant(id);
       showPopup("success", "Peserta berhasil dihapus.");
+      setDeleteConfirmId(null);
     } catch (e: any) {
       showPopup("error", `Error: ${e.message}`);
     } finally {
@@ -160,7 +161,7 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
                         </button>
                         <button 
                           className="text-xs font-semibold text-red-600 hover:underline px-3 py-1 bg-red-50 rounded-full transition-colors"
-                          onClick={() => handleDelete(p.id)}
+                          onClick={() => setDeleteConfirmId(p.id)}
                           disabled={loading}
                         >
                           Hapus
@@ -246,6 +247,31 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
             </div>
             <div className="sticky bottom-0 bg-white border-t border-ink px-6 py-4 flex justify-end">
               <button className="btn-primary" onClick={() => setSelectedPeserta(null)}>Tutup Detail</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-ink/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center">
+            <h3 className="font-semibold text-lg mb-2 text-ink">Hapus Peserta?</h3>
+            <p className="text-sm text-body-mid mb-6">Tindakan ini tidak dapat dibatalkan. Data peserta akan dihapus secara permanen.</p>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => setDeleteConfirmId(null)}
+                className="px-4 py-2 rounded-lg border border-ink text-sm font-semibold hover:bg-canvas-soft transition-colors"
+                disabled={loading}
+              >
+                Batal
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteConfirmId)}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+                disabled={loading}
+              >
+                {loading ? "Menghapus..." : "Ya, Hapus"}
+              </button>
             </div>
           </div>
         </div>
