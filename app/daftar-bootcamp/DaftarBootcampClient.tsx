@@ -136,16 +136,12 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
               </div>
               <div>
                 <label className="text-sm font-semibold text-ink block mb-1">NPM *</label>
-                <input required name="npm" value={formData.npm} onChange={handleChange} className="text-input w-full" placeholder="Cth: 20081010100" />
+                <input required name="npm" value={formData.npm} onChange={handleChange} className="text-input w-full" placeholder="Cth: G1A024001" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-ink block mb-1">Angkatan *</label>
                 <select required name="angkatan" value={formData.angkatan} onChange={handleChange} className="text-input w-full">
                   <option value="">Pilih Angkatan...</option>
-                  <option value="2020">2020</option>
-                  <option value="2021">2021</option>
-                  <option value="2022">2022</option>
-                  <option value="2023">2023</option>
                   <option value="2024">2024</option>
                   <option value="2025">2025</option>
                 </select>
@@ -199,7 +195,7 @@ export default function DaftarBootcampClient({ tracks }: { tracks: any[] }) {
                 <select required name="track2Id" value={formData.track2Id} onChange={handleChange} className="text-input w-full">
                   <option value="">Pilih Bidang...</option>
                   {tracks.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+                    <option key={t.id} value={t.id} disabled={t.id === formData.track1Id}>{t.name}</option>
                   ))}
                 </select>
               </div>
