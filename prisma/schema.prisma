@@ -162,3 +162,36 @@ enum RegStatus {
   ACCEPTED
   REJECTED
 }
+
+model BootcampTrack {
+  id                String @id @default(cuid())
+  name              String @unique
+  whatsappGroupLink String?
+  participants1     ParticipantRegistration[] @relation("Track1")
+  participants2     ParticipantRegistration[] @relation("Track2")
+}
+
+model ParticipantRegistration {
+  id              String    @id @default(cuid())
+  name            String
+  npm             String
+  angkatan        String
+  phone           String
+  email           String    @unique
+  track1Id        String
+  track1          BootcampTrack @relation("Track1", fields: [track1Id], references: [id])
+  reason1         String
+  experience1     ExperienceLevel
+  track2Id        String
+  track2          BootcampTrack @relation("Track2", fields: [track2Id], references: [id])
+  reason2         String
+  experience2     ExperienceLevel
+  commitment      Boolean
+  createdAt       DateTime  @default(now())
+}
+
+enum ExperienceLevel {
+  PEMULA
+  MENENGAH
+  MAHIR
+}

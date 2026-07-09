@@ -26,7 +26,8 @@ export default function Sidebar({ user }: { user: any }) {
   }
 
   if (user?.role === "SUPER_ADMIN" || user?.role === "SEKRETARIS" || user?.role === "KOORDINATOR_DIVISI") {
-    navItems.push({ name: "Pendaftaran", href: "/dashboard/registrasi", icon: UserPlus });
+    navItems.push({ name: "Pendaftaran Panitia", href: "/dashboard/registrasi", icon: UserPlus });
+    navItems.push({ name: "Pendaftaran Peserta", href: "/dashboard/peserta", icon: Users });
   }
 
   return (
