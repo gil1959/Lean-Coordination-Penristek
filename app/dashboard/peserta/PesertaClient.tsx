@@ -49,11 +49,15 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
   };
 
   const trackCounts = tracks.map((track: any) => {
+    const countOpsi1 = participants.filter((p: any) => p.track1Id === track.id).length;
+    const countOpsi2 = participants.filter((p: any) => p.track2Id === track.id).length;
     return {
       name: track.name,
-      count: participants.filter((p: any) => p.track1Id === track.id).length
+      countOpsi1,
+      countOpsi2,
+      totalCount: countOpsi1 + countOpsi2
     };
-  }).sort((a: any, b: any) => b.count - a.count);
+  }).sort((a: any, b: any) => b.totalCount - a.totalCount);
 
   return (
     <div className="space-y-6">
@@ -132,12 +136,15 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
           </div>
           
           <div className="card-content border border-mute">
-            <h3 className="font-semibold text-sm mb-4">Statistik Pendaftar per Bidang (Opsi 1)</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <h3 className="font-semibold text-sm mb-4">Statistik Peminat per Bidang (Total Opsi 1 & Opsi 2)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {trackCounts.map((tc: any, i: number) => (
                 <div key={i} className="flex justify-between items-center p-3 bg-canvas-soft rounded-lg border border-ink hover:border-primary/50 transition-colors">
-                  <span className="text-xs font-medium truncate max-w-[85%]" title={tc.name}>{tc.name}</span>
-                  <span className="text-xs font-bold bg-white px-2 py-1 rounded-full shadow-sm">{tc.count}</span>
+                  <div className="flex flex-col truncate mr-2">
+                    <span className="text-sm font-semibold truncate" title={tc.name}>{tc.name}</span>
+                    <span className="text-[10px] text-body-mid">Opsi 1: {tc.countOpsi1} | Opsi 2: {tc.countOpsi2}</span>
+                  </div>
+                  <span className="text-sm font-bold bg-white px-3 py-1 rounded-full shadow-sm border border-ink">{tc.totalCount}</span>
                 </div>
               ))}
             </div>
