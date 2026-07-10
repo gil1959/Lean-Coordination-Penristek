@@ -48,6 +48,13 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
     }
   };
 
+  const trackCounts = tracks.map((track: any) => {
+    return {
+      name: track.name,
+      count: participants.filter((p: any) => p.track1Id === track.id).length
+    };
+  }).sort((a: any, b: any) => b.count - a.count);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-end mb-6">
@@ -116,7 +123,27 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
       )}
 
       {activeTab === "daftar" && (
-        <div className="card-content overflow-hidden">
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col justify-center">
+              <p className="text-xs font-semibold text-primary uppercase mb-1">Total Pendaftar</p>
+              <h2 className="text-2xl font-bold text-ink">{participants.length} <span className="text-xs font-medium text-body-mid font-sans">Orang</span></h2>
+            </div>
+          </div>
+          
+          <div className="card-content border border-mute">
+            <h3 className="font-semibold text-sm mb-4">Statistik Pendaftar per Bidang (Opsi 1)</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {trackCounts.map((tc: any, i: number) => (
+                <div key={i} className="flex justify-between items-center p-3 bg-canvas-soft rounded-lg border border-ink hover:border-primary/50 transition-colors">
+                  <span className="text-xs font-medium truncate max-w-[85%]" title={tc.name}>{tc.name}</span>
+                  <span className="text-xs font-bold bg-white px-2 py-1 rounded-full shadow-sm">{tc.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card-content overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -173,6 +200,7 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
               </tbody>
             </table>
           </div>
+        </div>
         </div>
       )}
 
