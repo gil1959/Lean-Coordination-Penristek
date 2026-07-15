@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { updateTrackLink, deleteParticipant } from "./actions";
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { X, Printer } from "lucide-react";
 
 export default function PesertaClient({ initialData }: { initialData: any }) {
@@ -62,79 +62,85 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
   }).sort((a: any, b: any) => b.totalCount - a.totalCount);
 
   const generatePDF = () => {
-    const doc = new jsPDF();
-    
-    doc.setFont("times", "normal");
-    doc.setFontSize(14);
-    
-    // Title
-    doc.text("Daftar Peserta Bootcamp", 14, 20);
-    doc.setFontSize(12);
-    
-    // Table 1: All participants
-    const table1Column = ["No", "Nama", "NPM", "Angkatan", "Pilihan 1", "Pilihan 2"];
-    const table1Rows = participants.map((p: any, index: number) => [
-      index + 1,
-      p.name,
-      p.npm,
-      p.angkatan,
-      p.track1?.name || "-",
-      p.track2?.name || "-"
-    ]);
-  
-    (doc as any).autoTable({
-      startY: 30,
-      head: [table1Column],
-      body: table1Rows,
-      theme: 'plain',
-      styles: { font: "times", fontSize: 12, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 },
-      headStyles: { fontStyle: 'bold', fillColor: [255, 255, 255] },
-    });
-  
-    let finalY = (doc as any).lastAutoTable.finalY + 20;
-  
-    doc.setFontSize(14);
-    doc.setFont("times", "bold");
-    doc.text("Daftar Peserta per Bidang", 14, finalY);
-    finalY += 10;
-    doc.setFont("times", "normal");
-    doc.setFontSize(12);
-  
-    tracks.forEach((track: any) => {
-      const trackParticipants = participants.filter((p: any) => p.track1Id === track.id || p.track2Id === track.id);
+    try {
+      const doc = new jsPDF();
       
-      if (trackParticipants.length > 0) {
-        if (finalY > 250) {
-          doc.addPage();
-          finalY = 20;
+      doc.setFont("times", "normal");
+      doc.setFontSize(14);
+      
+      // Title
+      doc.text("Daftar Peserta Bootcamp", 14, 20);
+      doc.setFontSize(12);
+      doc.text(`Total Peserta: ${participants.length} Orang`, 14, 28);
+      
+      // Table 1: All participants
+      const table1Column = ["No", "Nama", "NPM", "Angkatan", "Pilihan 1", "Pilihan 2"];
+      const table1Rows = participants.map((p: any, index: number) => [
+        index + 1,
+        p.name,
+        p.npm,
+        p.angkatan,
+        p.track1?.name || "-",
+        p.track2?.name || "-"
+      ]);
+    
+      autoTable(doc, {
+        startY: 35,
+        head: [table1Column],
+        body: table1Rows,
+        theme: 'plain',
+        styles: { font: "times", fontSize: 12, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 },
+        headStyles: { fontStyle: 'bold', fillColor: [255, 255, 255] },
+      });
+    
+      let finalY = (doc as any).lastAutoTable.finalY + 20;
+    
+      doc.setFontSize(14);
+      doc.setFont("times", "bold");
+      doc.text("Daftar Peserta per Bidang", 14, finalY);
+      finalY += 10;
+      doc.setFont("times", "normal");
+      doc.setFontSize(12);
+    
+      tracks.forEach((track: any) => {
+        const trackParticipants = participants.filter((p: any) => p.track1Id === track.id || p.track2Id === track.id);
+        
+        if (trackParticipants.length > 0) {
+          if (finalY > 250) {
+            doc.addPage();
+            finalY = 20;
+          }
+    
+          doc.setFont("times", "bold");
+          doc.text(`Bidang: ${track.name}`, 14, finalY);
+          finalY += 5;
+          
+          const trackRows = trackParticipants.map((p: any, index: number) => [
+            index + 1,
+            p.name,
+            p.npm,
+            p.angkatan,
+            p.track1Id === track.id ? "1" : "2"
+          ]);
+    
+          autoTable(doc, {
+            startY: finalY,
+            head: [["No", "Nama", "NPM", "Angkatan", "Pilihan Ke"]],
+            body: trackRows,
+            theme: 'plain',
+            styles: { font: "times", fontSize: 12, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 },
+            headStyles: { fontStyle: 'bold', fillColor: [255, 255, 255] },
+          });
+          
+          finalY = (doc as any).lastAutoTable.finalY + 15;
         }
-  
-        doc.setFont("times", "bold");
-        doc.text(`Bidang: ${track.name}`, 14, finalY);
-        finalY += 5;
-        
-        const trackRows = trackParticipants.map((p: any, index: number) => [
-          index + 1,
-          p.name,
-          p.npm,
-          p.angkatan,
-          p.track1Id === track.id ? "1" : "2"
-        ]);
-  
-        (doc as any).autoTable({
-          startY: finalY,
-          head: [["No", "Nama", "NPM", "Angkatan", "Pilihan Ke"]],
-          body: trackRows,
-          theme: 'plain',
-          styles: { font: "times", fontSize: 12, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 },
-          headStyles: { fontStyle: 'bold', fillColor: [255, 255, 255] },
-        });
-        
-        finalY = (doc as any).lastAutoTable.finalY + 15;
-      }
-    });
-  
-    doc.save("Daftar_Peserta_Bootcamp.pdf");
+      });
+    
+      doc.save("Daftar_Peserta_Bootcamp.pdf");
+    } catch (error) {
+      console.error("Failed to generate PDF", error);
+      alert("Terjadi kesalahan saat mencetak PDF.");
+    }
   };
 
   return (
