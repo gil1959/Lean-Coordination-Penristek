@@ -68,14 +68,34 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
       doc.setFont("times", "normal");
       doc.setFontSize(14);
       
+      // Sort participants by angkatan
+      const sortedParticipants = [...participants].sort((a: any, b: any) => {
+        return (a.angkatan || "").localeCompare(b.angkatan || "");
+      });
+
+      // Calculate totals per angkatan
+      const angkatanCounts = sortedParticipants.reduce((acc: any, curr: any) => {
+        const angkatan = curr.angkatan || "Unknown";
+        acc[angkatan] = (acc[angkatan] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const angkatanText = Object.entries(angkatanCounts)
+        .map(([angkatan, count]) => `Angkatan ${angkatan}: ${count} Orang`)
+        .join("  |  ");
+
       // Title
       doc.text("Daftar Peserta Bootcamp", 14, 20);
       doc.setFontSize(12);
       doc.text(`Total Peserta: ${participants.length} Orang`, 14, 28);
       
+      doc.setFontSize(11);
+      doc.text(`${angkatanText}`, 14, 34);
+      doc.setFontSize(12);
+      
       // Table 1: All participants
       const table1Column = ["No", "Nama", "NPM", "Angkatan", "Pilihan 1", "Pilihan 2"];
-      const table1Rows = participants.map((p: any, index: number) => [
+      const table1Rows = sortedParticipants.map((p: any, index: number) => [
         index + 1,
         p.name,
         p.npm,
@@ -85,7 +105,7 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
       ]);
     
       autoTable(doc, {
-        startY: 35,
+        startY: 40,
         head: [table1Column],
         body: table1Rows,
         theme: 'plain',
@@ -103,7 +123,7 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
       doc.setFontSize(12);
     
       tracks.forEach((track: any) => {
-        const trackParticipants = participants.filter((p: any) => p.track1Id === track.id || p.track2Id === track.id);
+        const trackParticipants = sortedParticipants.filter((p: any) => p.track1Id === track.id || p.track2Id === track.id);
         
         if (trackParticipants.length > 0) {
           if (finalY > 250) {
@@ -113,7 +133,12 @@ export default function PesertaClient({ initialData }: { initialData: any }) {
     
           doc.setFont("times", "bold");
           doc.text(`Bidang: ${track.name}`, 14, finalY);
-          finalY += 5;
+          finalY += 6;
+          doc.setFont("times", "normal");
+          doc.setFontSize(11);
+          doc.text(`Total: ${trackParticipants.length} Orang`, 14, finalY);
+          finalY += 6;
+          doc.setFontSize(12);
           
           const trackRows = trackParticipants.map((p: any, index: number) => [
             index + 1,
